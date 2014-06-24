@@ -14,14 +14,57 @@ scale_factor_height = 1.0;
 er_str_len = 0;
 er_font_size = 12;
 
+//page content
+er_page_content = [];
+
 //set the number of characters that can fit into a page div
 var set_str_len = function(p_width, p_height) {
 	er_page_area = p_width * p_height;
 
 	//number of char that fit in the area
-	er_str_len = er_page_area / er_font_size;
+	er_str_len = er_page_area / (er_font_size * er_font_size);
+
+	//floor the result
+	er_str_len = Math.floor(er_str_len);
 
 	return er_str_len;
+}
+
+//divide manuscript into pages
+var div_pages = function(p_width, p_height, manuscript) {
+
+	//set the page length
+	set_str_len(p_width, p_height);
+
+	//set begin and end point of each page
+	var prev_point = 0;
+
+	//determine end point
+	var end_point = er_str_len;
+	//make sure we end on a white space or paragraph
+	end_point = manuscript.indexOf(' ', end_point);
+
+	while(end_point < manuscript.length) {
+		//substring
+		var page = manuscript.substring(prev_point, end_point);
+
+		//add to end of array
+		er_page_content[er_page_content.length] = page;
+
+		prev_point = end_point; //set new start point
+		end_point += er_str_len; //set new end point
+
+		//make sure we end on a white space or paragraph
+		end_point = manuscript.indexOf(' ', end_point);
+
+		if(end_point == -1){
+			end_point = manuscript.length;
+		}
+
+		if(end_point >= manuscript.length) {
+			end_point = manuscript.length;
+		}
+	}
 }
 
 //determine page widthxheight
@@ -48,7 +91,7 @@ function page_dimensions(width, height) {
 };
 
 //To use ereader, you must assign an area with the id="ereaderJS"
-var er_page_setup = function(p_width, p_height, manuscript) {
+var er_page_setup = function(p_width, p_height) {
 	//variable for textarea containing the body of text
 	//var ereader = $(page_id);
 
@@ -75,7 +118,7 @@ var er_page_setup = function(p_width, p_height, manuscript) {
 		"margin-left": "auto",
 		"margin-right": "auto",
 		"padding" : "16px 16px 16px 16px",
-		"overflow" : "hidden"
+		"overflow" : "auto"
 	});
 };
 
@@ -91,7 +134,16 @@ var er_format = function() {
     var ereader = $('#ereaderJS');
     var manuscript = ereader.val().replace(/\n/g, '</p><p>');
     manuscript = "<p>" + manuscript;
-    $('.er_output').html(manuscript);
+
+    //divide into pages
+	div_pages(dimensions[0], dimensions[1], manuscript);
+
+	for(i = 0; i < er_page_content.length; i++){
+		$('#er_output').append("<br/>***<br/>");
+		$('#er_output').append(er_page_content[i]);
+	}
+
+
     $('#testform').hide();
 
     //set up css on <p> element
@@ -103,6 +155,6 @@ var er_format = function() {
 
     manuscript = $('#ereaderJS').val();
 
-	er_page_setup(dimensions[0], dimensions[1], manuscript);
+	er_page_setup(dimensions[0], dimensions[1]);
 }
 
