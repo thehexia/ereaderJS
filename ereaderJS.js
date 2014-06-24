@@ -1,3 +1,5 @@
+
+
 /**
 (c) Hoang Nguyen 2014
 
@@ -5,7 +7,22 @@ Allows you to turn plain text into XHTML scrollable book format
 */
 
 //scale_factor
-scale_factor = 0.5;
+scale_factor_width = 0.5;
+scale_factor_height = 1.0;
+
+//the number of characters that can fit into a page div
+er_str_len = 0;
+er_font_size = 12;
+
+//set the number of characters that can fit into a page div
+var set_str_len = function(p_width, p_height) {
+	er_page_area = p_width * p_height;
+
+	//number of char that fit in the area
+	er_str_len = er_page_area / er_font_size;
+
+	return er_str_len;
+}
 
 //determine page widthxheight
 function page_dimensions(width, height) {
@@ -23,22 +40,22 @@ function page_dimensions(width, height) {
 	//if the width is greater than the height we can assume the screen is in landscape mode
 	// in this case we should only use part of the screen for the page
 	else {
-		p_width = width * scale_factor;
-		p_height = height;
+		p_width = width * scale_factor_width;
+		p_height = height * scale_factor_height;
 	}
 
 	return [p_width, p_height];
 };
 
 //To use ereader, you must assign an area with the id="ereaderJS"
-var er_page_setup = function(p_width, p_height, page_id) {
+var er_page_setup = function(p_width, p_height, manuscript) {
 	//variable for textarea containing the body of text
-	var ereader = $(page_id);
+	//var ereader = $(page_id);
 
 	//get text content
-	var manuscript = ereader.val();;
+	//var manuscript = ereader.val();;
 
-	var er_output = $('#er_output');
+	var er_output = $('.er_output');
 
 	//set up the page
 	$('body').css({
@@ -53,14 +70,12 @@ var er_page_setup = function(p_width, p_height, page_id) {
 		"backgroundColor": "white",
 		"width" : p_width,
 		"height": p_height,
-		"overflow": "auto",
+		"max-height": p_height - 32,
+		"max-width": p_width,
 		"margin-left": "auto",
-		"margin-right": "auto"
-	});
-
-	er_output.resizable({
-		"maxWidth": p_width,
-		"maxHeight": p_height
+		"margin-right": "auto",
+		"padding" : "16px 16px 16px 16px",
+		"overflow" : "hidden"
 	});
 };
 
@@ -76,7 +91,7 @@ var er_format = function() {
     var ereader = $('#ereaderJS');
     var manuscript = ereader.val().replace(/\n/g, '</p><p>');
     manuscript = "<p>" + manuscript;
-    $('#er_output').html(manuscript);
+    $('.er_output').html(manuscript);
     $('#testform').hide();
 
     //set up css on <p> element
@@ -86,6 +101,8 @@ var er_format = function() {
     	"padding" : "0"
     })
 
-	er_page_setup(dimensions[0], dimensions[1], "#ejreaderJS");
+    manuscript = $('#ereaderJS').val();
+
+	er_page_setup(dimensions[0], dimensions[1], manuscript);
 }
 
