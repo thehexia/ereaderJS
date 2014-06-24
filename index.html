@@ -3,12 +3,36 @@
 	<script src="http://code.jquery.com/jquery-latest.min.js"
         type="text/javascript"></script>
     <script src="ereaderJS.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+    	$(document).ready(function() {
+    		$('#submit').click(function(e) {
+    			e.preventDefault();
+    			er_format();
+    		})
+    	});
+
+    </script>
+
+ <style type="text/css">
+    body {
+    	background-image: url(theme/congruent_outline.png);
+    	background-repeat: repeat;
+    }
+ </style>
 </head>
 <body>
 
-<form>
-<textarea id="ereaderJS"> </textarea>
-<input type="submit"></input>
+<form id="testform">
+<pre>
+<textarea id="ereaderJS"> 
+</textarea>
+</pre>
+
+<input type="submit" id="submit"></input>
 </form>
+
+<div id="er_output">
+</div>
 </body>
 </html>
